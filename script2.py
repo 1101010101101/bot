@@ -1,38 +1,37 @@
 import requests
-import time
 from bs4 import BeautifulSoup
+from datetime import datetime
+
+EMAIL = "bot.hat.tg.oleg@gmail.com"
+URL = "https://hdmn.cloud/en/demo/success/"
+HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+
+def log(msg):
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
 
 def run():
     s = requests.Session()
-    s.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+    s.headers.update(HEADERS)
 
-    print("[DEBUG] Отправляем запрос...")
+    log("Отправляем запрос...")
+    resp = s.post(URL, data={"demo_mail": EMAIL}, allow_redirects=True, timeout=15)
 
-    resp = s.post(
-        "https://hdmn.cloud/en/demo/success/",
-        data={"demo_mail": "bot.hat.tg.oleg@gmail.com"},
-        allow_redirects=True,
-        timeout=15
-    )
+    log(f"Status: {resp.status_code}")
+    log(f"URL: {resp.url}")
 
-    print(f"[DEBUG] Status code: {resp.status_code}")
-    print(f"[DEBUG] Финальный URL: {resp.url}")
-    print(f"[DEBUG] Редиректы: {[r.url for r in resp.history]}")
-    print(f"[DEBUG] Размер ответа: {len(resp.text)} символов")
-    print(f"[DEBUG] Первые 500 символов HTML:\n{resp.text[:500]}")
+    if resp.history:
+        log(f"Редиректы: {' → '.join(r.url for r in resp.history)}")
+
+    log(f"Размер: {len(resp.text)} символов")
     print("-" * 50)
 
     soup = BeautifulSoup(resp.text, "html.parser")
     for t in soup(["script", "style", "noscript"]):
         t.decompose()
 
-    text = "\n".join([ln.strip() for ln in soup.get_text("\n").splitlines() if ln.strip()])
+    text = "\n".join(ln.strip() for ln in soup.get_text("\n").splitlines() if ln.strip())
     print(text)
+    print("-" * 50)
 
-while True:
-    try:
-        run()
-    except Exception as e:
-        print(f"Ошибка: {e}")
-    print("Ждём 5 минут...")
-    time.sleep(30)
+if __name__ == "__main__":
+    run()
