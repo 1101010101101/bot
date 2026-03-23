@@ -35,4 +35,4 @@ while True:
     except Exception as e:
         print(f"Ошибка: {e}")
     print("Ждём 5 минут...")
-    time.sleep(300)
+    time.sleep(30)
