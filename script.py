@@ -6,7 +6,7 @@ s.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
 
 resp = s.post(
     "https://hdmn.cloud/en/demo/success/",
-    data={"demo_mail": "bot.hat.tg.oleg@gmail.com"},
+    data={"demo_mail": "o8802864@gmail.com"},
     allow_redirects=True,
     timeout=15
 )
