@@ -10,7 +10,7 @@ import os
 from datetime import datetime
 
 # Конфигурация
-INTERVAL_MINUTES = 10  # Интервал запуска в минутах
+INTERVAL_MINUTES = 5  # Интервал запуска в минутах
 RETRY_ON_ERROR = False  # Повторять ли при ошибке
 RETRY_DELAY_MINUTES = 1  # Задержка перед повтором (если включено)
 MAX_RETRIES = 5  # Максимум попыток повтора
