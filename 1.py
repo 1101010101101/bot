@@ -18,7 +18,7 @@ def run_script():
         os.remove(cookies_file)
         print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 🗑 Куки удалены")
 
-    script_path = os.path.join(current_dir, "2.py")
+    script_path = os.path.join(current_dir, "script2.py")
     print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Запуск 2.py...")
 
     try:
