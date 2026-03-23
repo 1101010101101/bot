@@ -13,17 +13,17 @@ def run():
     s = requests.Session()
     s.headers.update(HEADERS)
 
-    log("Отправляем запрос...")
+    # log("Отправляем запрос...")
     resp = s.post(URL, data={"demo_mail": EMAIL}, allow_redirects=True, timeout=15)
 
-    log(f"Status: {resp.status_code}")
-    log(f"URL: {resp.url}")
+    # log(f"Status: {resp.status_code}")
+    # log(f"URL: {resp.url}")
 
-    if resp.history:
-        log(f"Редиректы: {' → '.join(r.url for r in resp.history)}")
+    # if resp.history:
+    #     log(f"Редиректы: {' → '.join(r.url for r in resp.history)}")
 
-    log(f"Размер: {len(resp.text)} символов")
-    print("-" * 50)
+    # log(f"Размер: {len(resp.text)} символов")
+    # print("-" * 50)
 
     soup = BeautifulSoup(resp.text, "html.parser")
     for t in soup(["script", "style", "noscript"]):
