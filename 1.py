@@ -18,7 +18,7 @@ MAX_RETRIES = 5  # Максимум попыток повтора
 def run_script():
     """Запускает скрипт 2.py"""
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    script_path = os.path.join(current_dir, "2.py")
+    script_path = os.path.join(current_dir, "script.py")
     
     print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Запуск 2.py...")
     
