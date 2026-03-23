@@ -28,4 +28,5 @@ for t in soup(["script", "style", "noscript"]):
 text = "\n".join([ln.strip() for ln in soup.get_text("\n").splitlines() if ln.strip()])
 
 print(f"[DEBUG] Извлечённый текст ({len(text)} символов):")
+
 print(text)
