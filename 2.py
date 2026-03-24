@@ -8,7 +8,7 @@ BASE = "https://hdmn.cloud"
 RAILWAY_TOKEN = "bc789e58-d32a-4449-a5f6-41901f51c919"
 SERVICE_ID = "c4f351b6-882b-4742-bdee-b4a5859a6fef"
 
-DELAY_MINUTES = 0
+DELAY_MINUTES = 10
 ENVIRONMENT_ID = "f3664da9-967c-47b3-8c30-69a77374e575"
 
 def redeploy():
