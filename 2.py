@@ -8,7 +8,31 @@ BASE = "https://hdmn.cloud"
 RAILWAY_TOKEN = "rlwy_oacs_faa52f4d5ec601c0cd042951632995bf5b54f042"
 SERVICE_ID = "c4f351b6-882b-4742-bdee-b4a5859a6fef"
 DELAY_MINUTES = 0
+ENVIRONMENT_ID = "f3664da9-967c-47b3-8c30-69a77374e575"
 
+def redeploy():
+    import time
+    log(f"Ждём {DELAY_MINUTES} минут перед перезапуском...")
+    time.sleep(DELAY_MINUTES * 60)
+    log("🔄 Запускаем новый деплой...")
+    r = requests.post(
+        "https://backboard.railway.app/graphql/v2",
+        headers={
+            "Authorization": f"Bearer {RAILWAY_TOKEN}",
+            "Content-Type": "application/json"
+        },
+        json={
+            "query": """
+                mutation {
+                    serviceInstanceRedeploy(
+                        serviceId: "%s"
+                        environmentId: "%s"
+                    )
+                }
+            """ % (SERVICE_ID, ENVIRONMENT_ID)
+        }
+    )
+    log(f"Redeploy статус: {r.status_code} | {r.text}")
 def log(msg):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
 
@@ -53,26 +77,26 @@ def run():
     print(text)
     print("-" * 50)
 
-def redeploy():
-    import time
-    log(f"Ждём {DELAY_MINUTES} минут перед перезапуском...")
-    time.sleep(DELAY_MINUTES * 60)
-    log("🔄 Запускаем новый деплой...")
-    r = requests.post(
-        "https://backboard.railway.app/graphql/v2",
-        headers={
-            "Authorization": f"Bearer {RAILWAY_TOKEN}",
-            "Content-Type": "application/json"
-        },
-        json={
-            "query": """
-                mutation {
-                    serviceInstanceRedeploy(serviceId: "%s")
-                }
-            """ % SERVICE_ID
-        }
-    )
-    log(f"Redeploy статус: {r.status_code} | {r.text}")
+# def redeploy():
+#     import time
+#     log(f"Ждём {DELAY_MINUTES} минут перед перезапуском...")
+#     time.sleep(DELAY_MINUTES * 60)
+#     log("🔄 Запускаем новый деплой...")
+#     r = requests.post(
+#         "https://backboard.railway.app/graphql/v2",
+#         headers={
+#             "Authorization": f"Bearer {RAILWAY_TOKEN}",
+#             "Content-Type": "application/json"
+#         },
+#         json={
+#             "query": """
+#                 mutation {
+#                     serviceInstanceRedeploy(serviceId: "%s")
+#                 }
+#             """ % SERVICE_ID
+#         }
+#     )
+#     log(f"Redeploy статус: {r.status_code} | {r.text}")
 
 if __name__ == "__main__":
     run()
