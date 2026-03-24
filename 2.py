@@ -5,21 +5,21 @@ from datetime import datetime
 EMAIL = "bot.hat.tg.oleg@gmail.com"
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
 BASE = "https://hdmn.cloud"
+RAILWAY_TOKEN = "rlwy_oacs_faa52f4d5ec601c0cd042951632995bf5b54f042"
+SERVICE_ID = "c4f351b6-882b-4742-bdee-b4a5859a6fef"
+DELAY_MINUTES = 5
 
 def log(msg):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
 
 def run():
-    # Новая сессия каждый раз — чистые куки
     s = requests.Session()
     s.headers.update(HEADERS)
 
-    # Шаг 1: заходим на страницу success чтобы найти ссылку отмены
     log("Проверяем текущий статус...")
     page = s.get(f"{BASE}/en/demo/success/", timeout=15)
     soup = BeautifulSoup(page.text, "html.parser")
 
-    # Ищем ссылку cancel на странице
     cancel_link = None
     for a in soup.find_all("a", href=True):
         if "cancel" in a["href"].lower():
@@ -32,9 +32,8 @@ def run():
         log(f"Отменяем: {cancel_link}")
         s.get(cancel_link, timeout=15)
     else:
-        log("Ссылка отмены не найдена — пробуем напрямую")
+        log("Ссылка отмены не найдена")
 
-    # Шаг 2: запрашиваем новый код
     log("Запрашиваем новый код...")
     resp = s.post(
         f"{BASE}/en/demo/success/",
@@ -54,5 +53,27 @@ def run():
     print(text)
     print("-" * 50)
 
+def redeploy():
+    import time
+    log(f"Ждём {DELAY_MINUTES} минут перед перезапуском...")
+    time.sleep(DELAY_MINUTES * 60)
+    log("🔄 Запускаем новый деплой...")
+    r = requests.post(
+        "https://backboard.railway.app/graphql/v2",
+        headers={
+            "Authorization": f"Bearer {RAILWAY_TOKEN}",
+            "Content-Type": "application/json"
+        },
+        json={
+            "query": """
+                mutation {
+                    serviceInstanceRedeploy(serviceId: "%s")
+                }
+            """ % SERVICE_ID
+        }
+    )
+    log(f"Redeploy статус: {r.status_code} | {r.text}")
+
 if __name__ == "__main__":
     run()
+    redeploy()
