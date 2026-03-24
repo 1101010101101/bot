@@ -7,7 +7,7 @@ HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
 BASE = "https://hdmn.cloud"
 RAILWAY_TOKEN = "rlwy_oacs_faa52f4d5ec601c0cd042951632995bf5b54f042"
 SERVICE_ID = "c4f351b6-882b-4742-bdee-b4a5859a6fef"
-DELAY_MINUTES = 5
+DELAY_MINUTES = 0
 
 def log(msg):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
