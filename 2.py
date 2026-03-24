@@ -5,7 +5,7 @@ from datetime import datetime
 EMAIL = "bot.hat.tg.oleg@gmail.com"
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
 BASE = "https://hdmn.cloud"
-RAILWAY_TOKEN = "rlwy_oacs_faa52f4d5ec601c0cd042951632995bf5b54f042"
+RAILWAY_TOKEN = "5f7bb081-998a-43cb-a995-f2c61821d250"
 SERVICE_ID = "c4f351b6-882b-4742-bdee-b4a5859a6fef"
 DELAY_MINUTES = 0
 ENVIRONMENT_ID = "f3664da9-967c-47b3-8c30-69a77374e575"
