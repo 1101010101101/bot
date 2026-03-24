@@ -8,15 +8,32 @@ BASE = "https://hdmn.cloud"
 RAILWAY_TOKEN = "5f7bb081-998a-43cb-a995-f2c61821d250"
 SERVICE_ID = "31c4efbe-77fa-400d-b5f6-b09646c52c2f"
 
-DELAY_MINUTES = 0
-ENVIRONMENT_ID = "f3664da9-967c-47b3-8c30-69a77374e575"
+DELAY_MINUTES = 30
+
 
 def redeploy():
-    import os, sys, time
+    import time
     log(f"Ждём {DELAY_MINUTES} минут перед перезапуском...")
     time.sleep(DELAY_MINUTES * 60)
-    log("🔄 Перезапускаем скрипт...")
-    os.execv(sys.executable, [sys.executable] + sys.argv)
+    log("🔄 Запускаем новый деплой...")
+    r = requests.post(
+        "https://backboard.railway.app/graphql/v2",
+        headers={
+            "Authorization": f"Bearer {RAILWAY_TOKEN}",
+            "Content-Type": "application/json"
+        },
+        json={
+            "query": """
+                mutation {
+                    serviceInstanceRedeploy(
+                        serviceId: "%s"
+                        environmentId: "%s"
+                    )
+                }
+            """ % (SERVICE_ID, ENVIRONMENT_ID)
+        }
+    )
+    log(f"Redeploy статус: {r.status_code} | {r.text}")
 def log(msg):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
 
