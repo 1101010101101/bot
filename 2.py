@@ -12,28 +12,11 @@ DELAY_MINUTES = 5
 ENVIRONMENT_ID = "f3664da9-967c-47b3-8c30-69a77374e575"
 
 def redeploy():
-    import time
+    import os, sys, time
     log(f"Ждём {DELAY_MINUTES} минут перед перезапуском...")
     time.sleep(DELAY_MINUTES * 60)
-    log("🔄 Запускаем новый деплой...")
-    r = requests.post(
-        "https://backboard.railway.app/graphql/v2",
-        headers={
-            "Authorization": f"Bearer {RAILWAY_TOKEN}",
-            "Content-Type": "application/json"
-        },
-        json={
-            "query": """
-                mutation {
-                    serviceInstanceRedeploy(
-                        serviceId: "%s"
-                        environmentId: "%s"
-                    )
-                }
-            """ % (SERVICE_ID, ENVIRONMENT_ID)
-        }
-    )
-    log(f"Redeploy статус: {r.status_code} | {r.text}")
+    log("🔄 Перезапускаем скрипт...")
+    os.execv(sys.executable, [sys.executable] + sys.argv)
 def log(msg):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
 
