@@ -1,5 +1,4 @@
 import requests
-import time
 from bs4 import BeautifulSoup
 from datetime import datetime
 
@@ -8,62 +7,35 @@ HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
 BASE = "https://hdmn.cloud"
 RAILWAY_TOKEN = "bc789e58-d32a-4449-a5f6-41901f51c919"
 SERVICE_ID = "c4f351b6-882b-4742-bdee-b4a5859a6fef"
+
+DELAY_MINUTES = 0
 ENVIRONMENT_ID = "f3664da9-967c-47b3-8c30-69a77374e575"
 
-DELAY_MINUTES = 10
-MAX_ATTEMPTS = 500
-
-
-def log(msg):
-    print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
-
-
 def redeploy():
+    import time
     log(f"Ждём {DELAY_MINUTES} минут перед перезапуском...")
     time.sleep(DELAY_MINUTES * 60)
-
-    for attempt in range(1, MAX_ATTEMPTS + 1):
-        log(f"🔄 Попытка {attempt}/{MAX_ATTEMPTS} — запускаем деплой...")
-
-        try:
-            r = requests.post(
-                "https://backboard.railway.app/graphql/v2",
-                headers={
-                    "Authorization": f"Bearer {RAILWAY_TOKEN}",
-                    "Content-Type": "application/json"
-                },
-                json={
-                    "query": """
-                        mutation {
-                            serviceInstanceRedeploy(
-                                serviceId: "%s"
-                                environmentId: "%s"
-                            )
-                        }
-                    """ % (SERVICE_ID, ENVIRONMENT_ID)
-                },
-                timeout=30
-            )
-
-            if r.status_code == 200:
-                log(f"✅ Redeploy успешно запущен: {r.text}")
-                return
-
-            elif r.status_code == 429:
-                wait = 2 ** attempt * 5  # 10, 20, 40, 80, 160 минут
-                log(f"⚠️ Rate limited (429). Ждём {wait} минут...")
-                time.sleep(wait * 60)
-
-            else:
-                log(f"❌ Неожиданный статус {r.status_code}: {r.text}")
-                return
-
-        except requests.RequestException as e:
-            log(f"❌ Ошибка запроса: {e}")
-            return
-
-    log("🚫 Все попытки исчерпаны. Redeploy не выполнен.")
-
+    log("🔄 Запускаем новый деплой...")
+    r = requests.post(
+        "https://backboard.railway.app/graphql/v2",
+        headers={
+            "Authorization": f"Bearer {RAILWAY_TOKEN}",
+            "Content-Type": "application/json"
+        },
+        json={
+            "query": """
+                mutation {
+                    serviceInstanceRedeploy(
+                        serviceId: "%s"
+                        environmentId: "%s"
+                    )
+                }
+            """ % (SERVICE_ID, ENVIRONMENT_ID)
+        }
+    )
+    log(f"Redeploy статус: {r.status_code} | {r.text}")
+def log(msg):
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
 
 def run():
     s = requests.Session()
@@ -106,6 +78,26 @@ def run():
     print(text)
     print("-" * 50)
 
+# def redeploy():
+#     import time
+#     log(f"Ждём {DELAY_MINUTES} минут перед перезапуском...")
+#     time.sleep(DELAY_MINUTES * 60)
+#     log("🔄 Запускаем новый деплой...")
+#     r = requests.post(
+#         "https://backboard.railway.app/graphql/v2",
+#         headers={
+#             "Authorization": f"Bearer {RAILWAY_TOKEN}",
+#             "Content-Type": "application/json"
+#         },
+#         json={
+#             "query": """
+#                 mutation {
+#                     serviceInstanceRedeploy(serviceId: "%s")
+#                 }
+#             """ % SERVICE_ID
+#         }
+#     )
+#     log(f"Redeploy статус: {r.status_code} | {r.text}")
 
 if __name__ == "__main__":
     run()
