@@ -1,5 +1,4 @@
 import requests
-import subprocess
 import time
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -12,6 +11,7 @@ SERVICE_ID = "c4f351b6-882b-4742-bdee-b4a5859a6fef"
 ENVIRONMENT_ID = "f3664da9-967c-47b3-8c30-69a77374e575"
 
 DELAY_MINUTES = 0
+MAX_ATTEMPTS = 5
 
 
 def log(msg):
@@ -21,24 +21,48 @@ def log(msg):
 def redeploy():
     log(f"Ждём {DELAY_MINUTES} минут перед перезапуском...")
     time.sleep(DELAY_MINUTES * 60)
-    log("🔄 Запускаем новый деплой через Railway CLI...")
 
-    result = subprocess.run(
-        [
-            "railway", "redeploy",
-            "--service", SERVICE_ID,
-            "--environment", ENVIRONMENT_ID,
-            "--yes"  # без интерактивного подтверждения
-        ],
-        env={"RAILWAY_TOKEN": RAILWAY_TOKEN, "PATH": "/usr/local/bin:/usr/bin:/bin"},
-        capture_output=True,
-        text=True
-    )
+    for attempt in range(1, MAX_ATTEMPTS + 1):
+        log(f"🔄 Попытка {attempt}/{MAX_ATTEMPTS} — запускаем деплой...")
 
-    if result.returncode == 0:
-        log(f"✅ Redeploy запущен успешно:\n{result.stdout.strip()}")
-    else:
-        log(f"❌ Ошибка redeploy (код {result.returncode}):\n{result.stderr.strip()}")
+        try:
+            r = requests.post(
+                "https://backboard.railway.app/graphql/v2",
+                headers={
+                    "Authorization": f"Bearer {RAILWAY_TOKEN}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "query": """
+                        mutation {
+                            serviceInstanceRedeploy(
+                                serviceId: "%s"
+                                environmentId: "%s"
+                            )
+                        }
+                    """ % (SERVICE_ID, ENVIRONMENT_ID)
+                },
+                timeout=30
+            )
+
+            if r.status_code == 200:
+                log(f"✅ Redeploy успешно запущен: {r.text}")
+                return
+
+            elif r.status_code == 429:
+                wait = 2 ** attempt * 5  # 10, 20, 40, 80, 160 минут
+                log(f"⚠️ Rate limited (429). Ждём {wait} минут...")
+                time.sleep(wait * 60)
+
+            else:
+                log(f"❌ Неожиданный статус {r.status_code}: {r.text}")
+                return
+
+        except requests.RequestException as e:
+            log(f"❌ Ошибка запроса: {e}")
+            return
+
+    log("🚫 Все попытки исчерпаны. Redeploy не выполнен.")
 
 
 def run():
