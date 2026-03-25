@@ -1,4 +1,6 @@
 import requests
+import subprocess
+import time
 from bs4 import BeautifulSoup
 from datetime import datetime
 
@@ -7,35 +9,37 @@ HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
 BASE = "https://hdmn.cloud"
 RAILWAY_TOKEN = "bc789e58-d32a-4449-a5f6-41901f51c919"
 SERVICE_ID = "c4f351b6-882b-4742-bdee-b4a5859a6fef"
-
-DELAY_MINUTES = 10
 ENVIRONMENT_ID = "f3664da9-967c-47b3-8c30-69a77374e575"
 
-def redeploy():
-    import time
-    log(f"Ждём {DELAY_MINUTES} минут перед перезапуском...")
-    time.sleep(DELAY_MINUTES * 60)
-    log("🔄 Запускаем новый деплой...")
-    r = requests.post(
-        "https://backboard.railway.app/graphql/v2",
-        headers={
-            "Authorization": f"Bearer {RAILWAY_TOKEN}",
-            "Content-Type": "application/json"
-        },
-        json={
-            "query": """
-                mutation {
-                    serviceInstanceRedeploy(
-                        serviceId: "%s"
-                        environmentId: "%s"
-                    )
-                }
-            """ % (SERVICE_ID, ENVIRONMENT_ID)
-        }
-    )
-    log(f"Redeploy статус: {r.status_code} | {r.text}")
+DELAY_MINUTES = 10
+
+
 def log(msg):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
+
+
+def redeploy():
+    log(f"Ждём {DELAY_MINUTES} минут перед перезапуском...")
+    time.sleep(DELAY_MINUTES * 60)
+    log("🔄 Запускаем новый деплой через Railway CLI...")
+
+    result = subprocess.run(
+        [
+            "railway", "redeploy",
+            "--service", SERVICE_ID,
+            "--environment", ENVIRONMENT_ID,
+            "--yes"  # без интерактивного подтверждения
+        ],
+        env={"RAILWAY_TOKEN": RAILWAY_TOKEN, "PATH": "/usr/local/bin:/usr/bin:/bin"},
+        capture_output=True,
+        text=True
+    )
+
+    if result.returncode == 0:
+        log(f"✅ Redeploy запущен успешно:\n{result.stdout.strip()}")
+    else:
+        log(f"❌ Ошибка redeploy (код {result.returncode}):\n{result.stderr.strip()}")
+
 
 def run():
     s = requests.Session()
@@ -78,26 +82,6 @@ def run():
     print(text)
     print("-" * 50)
 
-# def redeploy():
-#     import time
-#     log(f"Ждём {DELAY_MINUTES} минут перед перезапуском...")
-#     time.sleep(DELAY_MINUTES * 60)
-#     log("🔄 Запускаем новый деплой...")
-#     r = requests.post(
-#         "https://backboard.railway.app/graphql/v2",
-#         headers={
-#             "Authorization": f"Bearer {RAILWAY_TOKEN}",
-#             "Content-Type": "application/json"
-#         },
-#         json={
-#             "query": """
-#                 mutation {
-#                     serviceInstanceRedeploy(serviceId: "%s")
-#                 }
-#             """ % SERVICE_ID
-#         }
-#     )
-#     log(f"Redeploy статус: {r.status_code} | {r.text}")
 
 if __name__ == "__main__":
     run()
