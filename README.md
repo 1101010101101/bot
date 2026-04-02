@@ -9,22 +9,7 @@
 
 
 
-
-
-![Y7jYu75wVI](https://github.com/user-attachments/assets/0c3cb423-bcee-45b0-a756-1abf0cf01d10)
-
-
-
-
-
-
-
-
-
-
-
-![Y7jYu75wVI](https://github.com/user-attachments/assets/c365acf3-e419-4082-946f-fb62494c3257)
-
+![Image](https://github.com/user-attachments/assets/7748527f-34f8-4225-8e8c-fbceee7db802)
 
 
 
