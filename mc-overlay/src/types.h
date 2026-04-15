@@ -1,5 +1,6 @@
 #pragma once
 #include <windows.h>
+#include <atomic>
 
 // ============================================================
 //  Shared data structures — included by all translation units
@@ -21,5 +22,5 @@ struct GameData {
     int    entityCount;
 };
 
-extern GameData       g_data;
-extern volatile bool  g_running;
+extern GameData              g_data;
+extern std::atomic<bool>     g_running;
