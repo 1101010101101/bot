@@ -12,7 +12,7 @@ s.headers.update({
 try:
     resp = s.post(
         "https://hdmn.cloud/en/demo/success/",
-        data={"demo_mail": "bot.hat.tg.oleg@gmail.com"},
+        data={"demo_mail": "soleg271828@gmail.com"},
         allow_redirects=True,
         timeout=30  # увеличили с 15 до 30 секунд
     )
